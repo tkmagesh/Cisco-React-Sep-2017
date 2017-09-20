@@ -8,26 +8,35 @@
 	<script src="babel.min.js"></script>
 	<script type="text/babel">
 		class HelloWorld extends React.Component{
+			state = {
+				message : ''
+			}
+			greet(){
+				var username = this.refs.txtUserName.value;
+				var greetMsg = `Hi ${username}, Have a nice day!`;
+				this.setState({message : greetMsg});
+			}
 			render(){
 				return (
 					<div>
-						<h1>{this.props.message}</h1>
+						<label>Name :</label>
+						<input type="text" ref="txtUserName"/>
+						<input type="button" value="Greet" id="btnGreet" onClick={this.greet.bind(this)}/>
+						<h1>{this.state.message}</h1>
 						<hr />
 						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur aperiam obcaecati, sit. Repellat accusantium exercitationem minima, mollitia adipisci, minus repudiandae suscipit consectetur nulla asperiores provident consequatur est tempora, iste, facere!</p>
 					</div>
 				)
 			}
 		}
-		function greet(){
-			var username = prompt('Enter the name :');
-			var greetMsg = `Hi ${username}, Have a nice day!`;
-			ReactDOM.render(<HelloWorld message={greetMsg}></HelloWorld>, document.getElementById('content'));
-		}
-		document.getElementById('btnGreet').addEventListener('click', greet);
+		
+		
+		ReactDOM.render(<HelloWorld ></HelloWorld>, document.getElementById('content'));
+
 	</script>
 </head>
 <body>
-	<input type="button" value="Greet" id="btnGreet">
+	
 	<div id="content"></div>
 </body>
 </html>
