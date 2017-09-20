@@ -8,7 +8,12 @@
 	<script>
 		class HelloWorld extends React.Component{
 			render(){
-				return React.createElement('h1', null, 'Welcome to React.js!');
+				//return React.createElement('h1', null, 'Welcome to React.js!');
+				return React.createElement('div', {id : 'div-1'}, 
+					React.createElement('h1', null, 'Welcome to React.js!'),
+					React.createElement('hr', null, null),
+					React.createElement('p', null, 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt laboriosam est, perferendis, dolorum harum at animi nemo quo ad obcaecati cumque commodi tenetur labore asperiores eaque fuga, velit corrupti unde!')
+				)
 			}
 		}
 		function init(){
