@@ -43,9 +43,17 @@
 		
 
 		class ProductList extends React.Component{
+			state = {
+				show : 'all'
+			};
 			onAddNewClick(){
 				let productName = this.refs.txtProductName.value;
 				this.props.model.addNew(productName);
+			}
+			onRadioClick(evt){
+				this.setState({
+					show : evt.target.value
+				});
 			}
 			render(){
 				let products = this.props.model.getData();
@@ -54,19 +62,34 @@
 				for(let index=0, count = products.length; index < count; index++){
 					productIems.push(<li key={index}>{products[index]}</li>);
 				}*/
-				let productIems = products.map((product, index) => {
-					let productStyle = index % 2 === 0 ? 'even' : 'odd';
-					return (<li key={index} className={productStyle}>{products[index]}</li>);
-				});
 
+				/*let productIems = products.map((product, index) => {
+					let productStyle = index % 2 === 0 ? 'even' : 'odd';
+					let shouldProductBeDisplayed = (this.state.show === 'even' && index % 2 === 0) || (this.state.show === 'odd' && index % 2 !== 0) || (this.state.show === 'all');
+					if (shouldProductBeDisplayed){
+						return (<li key={index} className={productStyle}>{products[index]}</li>);
+					}
+				});*/
+
+				let productItems = products
+					.filter((product, index) => (this.state.show === 'even' && index % 2 === 0) || (this.state.show === 'odd' && index % 2 !== 0) || (this.state.show === 'all'))
+					.map((product, index) => {
+						let styleName = this.state.show === 'all' ? (index % 2 === 0 ? 'even' : 'odd') : this.state.show;
+						return (<li key={index} className={styleName}>{product}</li>);
+					});
+				
 				return(
 					<div>
+						<label>Odd : </label><input type="radio" name="g1" value="odd" onClick={(evt) => this.onRadioClick(evt) } />
+						<label>Even :</label> <input type="radio" name="g1" value="even" onClick={(evt) => this.onRadioClick(evt) } />
+						<label>All : </label><input type="radio" name="g1" value="all" onClick={(evt) => this.onRadioClick(evt) } />
+						<hr/>
 						<label>Product Name :</label>
 						<input type="text" ref="txtProductName"/>
 						<input type="button" value="Add New" onClick={() => this.onAddNewClick()}/>
 						<hr/>
 						<ol>
-							{productIems}
+							{productItems}
 						</ol>
 					</div>
 				)
@@ -85,9 +108,7 @@
 <body>
 	<h1>Listing</h1>
 	<hr/>
-	<label>Odd : </label><input type="radio" name="g1" value="odd" />
-	<label>Even :</label> <input type="radio" name="g1" value="even" />
-	<label>All : </label><input type="radio" name="g1" value="all" />
+	
 
 	<div id="content"></div>
 </body>
