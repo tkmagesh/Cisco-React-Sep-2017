@@ -3,7 +3,14 @@
 <head>
 	<meta charset="UTF-8">
 	<title>React-Listing</title>
-	
+	<style>
+		.odd{
+			color : blue;
+		}
+		.even {
+			color : red;
+		}
+	</style>
 	<script src="react.js"></script>
 	<script src="react-dom.js"></script>
 	<script src="babel.min.js"></script>
@@ -47,7 +54,10 @@
 				for(let index=0, count = products.length; index < count; index++){
 					productIems.push(<li key={index}>{products[index]}</li>);
 				}*/
-				let productIems = products.map((product, index) => (<li key={index}>{products[index]}</li>));
+				let productIems = products.map((product, index) => {
+					let productStyle = index % 2 === 0 ? 'even' : 'odd';
+					return (<li key={index} className={productStyle}>{products[index]}</li>);
+				});
 
 				return(
 					<div>
@@ -62,7 +72,7 @@
 				)
 			}
 		}
-		
+
 		let products = new Products();
 		function renderApp(){
 			ReactDOM.render(<ProductList model={products}></ProductList>, 
@@ -75,6 +85,10 @@
 <body>
 	<h1>Listing</h1>
 	<hr/>
+	<label>Odd : </label><input type="radio" name="g1" value="odd" />
+	<label>Even :</label> <input type="radio" name="g1" value="even" />
+	<label>All : </label><input type="radio" name="g1" value="all" />
+
 	<div id="content"></div>
 </body>
 </html>
