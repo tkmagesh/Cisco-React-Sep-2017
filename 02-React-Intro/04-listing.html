@@ -8,11 +8,40 @@
 	<script src="react-dom.js"></script>
 	<script src="babel.min.js"></script>
 	<script type="text/babel">
-		var products = ['Pen', 'Pencil', 'Marker', 'Scribble Pad', 'Mouse'];
+		class EventEmitter{
+			_changeListeners = [];
+			triggerChange(){
+				this._changeListeners.forEach(function(listenerFn){
+					if (typeof listenerFn === 'function')
+						listenerFn();	
+				});
+			}
+			subscribe(listenerFn){
+				this._changeListeners.push(listenerFn);
+			}
+		}
+		class Products extends EventEmitter{
+			__data__ = [];
+
+			addNew(productName){
+				this.__data__.push(productName);
+				this.triggerChange();
+			}
+
+			getData(){
+				return [...this.__data__];
+			}
+		}
+
+		
 
 		class ProductList extends React.Component{
+			onAddNewClick(){
+				let productName = this.refs.txtProductName.value;
+				this.props.model.addNew(productName);
+			}
 			render(){
-				let products = this.props.products;
+				let products = this.props.model.getData();
 
 				/*let productIems = [];
 				for(let index=0, count = products.length; index < count; index++){
@@ -23,8 +52,8 @@
 				return(
 					<div>
 						<label>Product Name :</label>
-						<input type="text" />
-						<input type="button" value="Add New" />
+						<input type="text" ref="txtProductName"/>
+						<input type="button" value="Add New" onClick={() => this.onAddNewClick()}/>
 						<hr/>
 						<ol>
 							{productIems}
@@ -33,7 +62,14 @@
 				)
 			}
 		}
-		ReactDOM.render(<ProductList products={products}></ProductList>, document.getElementById('content'));
+		
+		let products = new Products();
+		function renderApp(){
+			ReactDOM.render(<ProductList model={products}></ProductList>, 
+			document.getElementById('content'));
+		}
+		products.subscribe(renderApp);
+		renderApp();
 	</script>
 </head>
 <body>
