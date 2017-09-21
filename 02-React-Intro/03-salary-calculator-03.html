@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>React-HelloWorld!</title>
+	<style>
+		.field{
+			margin-bottom: 10px;
+		}
+		#spanSalary{
+			color : red;
+			font-size: 22pt;
+		}
+		td{
+			padding: 10px;
+		}
+		label{
+			display: block;
+		}
+		body{
+			margin-left: 50px;
+		}
+	</style>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		String.prototype.toInt = function() {
+			return parseInt(this, 10);
+		};
+
+		//Event Emitter
+		class EventEmitter{
+			_changeListeners = [];
+			triggerChange(){
+				this._changeListeners.forEach(function(listenerFn){
+					if (typeof listenerFn === 'function')
+						listenerFn();	
+				});
+			}
+			subscribe(listenerFn){
+				this._changeListeners.push(listenerFn);
+			}
+		}
+		
+		//State & Behavior
+		//Model
+		class SalaryCalculatorModel extends EventEmitter{
+			constructor(){
+				super();
+			}
+
+			_data = {
+				basic : 0,
+				hra : 0,
+				da : 0,
+				tax : 0,
+				salary : 0
+			};
+			
+
+			get(attrName){
+				return this._data[attrName];
+			};
+
+			set(attrName, value){
+				if (this._data[attrName] === value) return;
+				this._data[attrName] = value;
+				this.triggerChange();
+			};
+
+			getData(){
+				return { ...this._data };
+			}
+			
+			calculate() {
+				var gross = this.get('basic') + this.get('hra') + this.get('da');
+				var net = gross * ((100-this.get('tax'))/100);
+				this.set('salary', net);
+			}
+		}
+
+		class SalaryCalculator extends React.Component{
+			getChangeListenerFor(attrName){
+				return function(evt){
+					this.props.model.set(attrName, evt.target.value.toInt());
+				}.bind(this);
+			}
+			
+			onCalculateClick(){
+				this.props.model.calculate();
+			}
+			render(){
+				var data = this.props.model.getData();
+				return(
+					<div>
+						<NumberField displayName="Basic" onFieldChange={this.getChangeListenerFor('basic')}></NumberField>
+						<NumberField displayName="Hra" onFieldChange={this.getChangeListenerFor('hra')}></NumberField>
+						<NumberField displayName="Da" onFieldChange={this.getChangeListenerFor('da')}></NumberField>
+						<RangeField displayName="Tax" onFieldChange={this.getChangeListenerFor('tax')}></RangeField>
+						
+						<div className="field">
+								<input type="button" value="Calculate" onClick={this.onCalculateClick.bind(this)} />
+						</div>
+						<div className="field">
+							<SalaryCalculatorTable data={data}></SalaryCalculatorTable>
+						</div>
+					</div>
+				)
+			}
+		}
+		class NumberField extends React.Component{
+			render(){
+				return(
+					<div className="field">
+							<label htmlFor="">{this.props.displayName}</label>
+							<input type="number" onChange={this.props.onFieldChange} />
+					</div>
+				)
+			}
+		}
+		class RangeField extends React.Component{
+			render(){
+				return(
+					<div className="field">
+							<label htmlFor="">{this.props.displayName}</label>
+							<input type="range" onChange={this.props.onFieldChange} min="0" max="30" defaultValue="0" />
+					</div>
+				)
+			}
+		}
+		class SalaryCalculatorTable extends React.Component{
+			render(){
+				let data = this.props.data;
+				return (
+					<table>
+						<thead>
+							<tr>
+								<th>Basic</th>
+								<th>Hra</th>
+								<th>Da</th>
+								<th>Tax</th>
+								<th>Salary</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><span id="spanBasic">{data.basic}</span></td>
+								<td><span id="spanHra">{data.hra}</span></td>
+								<td><span id="spanDa">{data.da}</span></td>
+								<td><span id="spanTax">{data.tax}</span></td>
+								<td><span id="spanSalary">{data.salary}</span></td>
+							</tr>
+						</tbody>
+					</table>
+				)
+			}
+		} 
+		var model = new SalaryCalculatorModel();
+		
+		
+		function renderApp(){
+			ReactDOM.render(<SalaryCalculator model={model}></SalaryCalculator>, document.getElementById('content'));
+		}
+		model.subscribe(renderApp);
+		renderApp();
+	</script>
+</head>
+<body>
+	<h1>Salary Calculator</h1>
+	<hr/>
+	<div id="content"></div>
+</body>
+</html>
