@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>React-HelloWorld!</title>
+	<script src="stateManager.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		function counterReducer(currentState = 0, action){
+			if (action.type === 'INCREMENT')
+				return ++currentState;
+			if (action.type === 'DECREMENT')
+				return --currentState;
+			return currentState;
+		}
+		let store = SM.createStore(counterReducer);
+
+		function dispatch_increment_action(){
+			var inc_action = { type : 'INCREMENT'};
+			store.dispatch(inc_action);
+		}
+		function dispatch_decrement_action(){
+			var dec_action = { type : 'DECREMENT'};
+			store.dispatch(dec_action);
+		}
+
+		class Counter extends React.Component{
+			onIncClick(){
+				this.props.actions.increment();
+			}
+			onDecClick(){
+				this.props.actions.decrement();
+			}
+			render(){
+				return (
+					<div>
+						<input type="button" value="Decrement" onClick={() => this.onDecClick()}/>
+						<span>{this.props.value}</span>
+						<input type="button" value="Increment" onClick={() => this.onIncClick()}/>
+					</div>
+				)
+			}
+		}
+		var actions = {
+			increment : dispatch_increment_action,
+			decrement : dispatch_decrement_action
+		};
+
+		function renderApp(){
+			ReactDOM.render(<Counter actions={actions} value={store.getState()}></Counter>,
+				document.getElementById('content'));
+		}
+		store.subscribe(renderApp);
+		renderApp();
+		
+	</script>
+</head>
+<body>
+	
+	<div id="content"></div>
+</body>
+</html>
