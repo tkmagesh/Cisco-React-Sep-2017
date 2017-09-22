@@ -110,7 +110,8 @@
 		let ConnectedBugTracker = ReactRedux.connect(
 			function mapStateToProps(state){
 				return {
-					bugs : state.bugs.filter((bug, index) => { return index % 2 === state.counter % 2})
+					//bugs : state.bugs.filter((bug, index) => { return index % 2 === state.counter % 2})
+					bugs : state.bugs
 				}
 			},
 			function mapDispatchToProps(dispatch){

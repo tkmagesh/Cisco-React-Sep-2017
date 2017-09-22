@@ -1,0 +1,29 @@
+
+
+reducers/
+	all reducers
+store
+	create and return the store
+
+bugTracker
+	actions/
+		all actions
+	view
+		BugEdit
+		BugList
+		BugItem	
+	BugTracker
+
+counter
+	actions/
+	Counter
+
+index.js
+	import store
+	render Provider 
+		with App
+
+App.js
+	import BugTracker, Counter
+	
+
