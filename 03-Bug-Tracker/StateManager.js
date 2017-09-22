@@ -33,7 +33,19 @@ var SM = (function(){
 			subscribe : subscribe
 		}
 	}
+	function bindActionCreators(actionCreators, dispatch){
+		let result = {};
+		for(let key in actionCreators){
+			result[key] = function(){
+				let actionCreator = actionCreators[key];
+				let action = actionCreator.apply(undefined, arguments);
+				dispatch(action);
+			}
+		}
+		return result;
+	}
 	return {
-		createStore : createStore
+		createStore : createStore,
+		bindActionCreators : bindActionCreators
 	}
 })()

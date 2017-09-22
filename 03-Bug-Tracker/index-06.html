@@ -45,7 +45,7 @@
 	<script src="react.js"></script>
 	<script src="react-dom.js"></script>
 	<script src="babel.min.js"></script>
-	<script src="stateManager.js"></script>
+	<script src="redux.js"></script>
 	
 
 	<script type="text/babel">
@@ -130,38 +130,83 @@
 			return currentState;
 		}
 
-		
-		function newBugActionFactory(dispatch){
-			return function(newBugName){
+		var bugActionsCreators = {
+			addNew : function(newBugName){
 				let newBugAction = { type : bugActionNames.add_new, payload : newBugName};
-				dispatch(newBugAction);
-			}
-		}
+				return newBugAction;
+			},
 
-		function toggleBugActionFactory(dispatch){
-			return function(bugToToggle){
+			toggle : function(bugToToggle){
 				let toggleBugAction = { type : bugActionNames.toggle, payload : bugToToggle};
-				dispatch(toggleBugAction);
-			}
-		}
+				return toggleBugAction;
+			},
 
-		function removeClosedActionFactory(dispatch){
-			return function(){
+			removeClosed : function(){
 				let removeClosedAction = { type : bugActionNames.remove_closed};
-				dispatch(removeClosedAction);
+				return removeClosedAction;
 			}
 		}
-
 		
-		window.store = SM.createStore(bugsReducer);
-		store.subscribe(renderApp)
-		let bugActions = {
-			addNew : newBugActionFactory(store.dispatch),
-			toggle : toggleBugActionFactory(store.dispatch),
-			removeClosed : removeClosedActionFactory(store.dispatch)
+		/* Counter */
+		function counterReducer(currentState = 0, action){
+			if (action.type === 'INCREMENT')
+				return ++currentState;
+			if (action.type === 'DECREMENT')
+				return --currentState;
+			return currentState;
 		}
+		
+		
+		var counterActionCreators = {
+			increment : function(){
+				return { type : 'INCREMENT'};
+			},
+			decrement : function(){
+				return { type : 'DECREMENT'}
+			}
+		}
+		
+
+		class Counter extends React.Component{
+			onIncClick(){
+				this.props.increment();
+			}
+			onDecClick(){
+				this.props.decrement();
+			}
+			render(){
+				return (
+					<div>
+						<input type="button" value="Decrement" onClick={() => this.onDecClick()}/>
+						<span>{this.props.value}</span>
+						<input type="button" value="Increment" onClick={() => this.onIncClick()}/>
+					</div>
+				)
+			}
+		}
+		
+
+		var allReducers = Redux.combineReducers({
+			bugs : bugsReducer,
+			counter : counterReducer
+		});
+		
+		window.store = Redux.createStore(allReducers);
+		
+		store.subscribe(renderApp)
+		
+		let bugActions = Redux.bindActionCreators(bugActionsCreators, store.dispatch);
+		let counterActions = Redux.bindActionCreators(counterActionCreators, store.dispatch);
+
 		function renderApp(){
-			ReactDOM.render(<BugTracker bugs={store.getState()} {...bugActions} />, document.getElementById('content'));
+			let { bugs, counter} = store.getState();
+			ReactDOM.render(
+				<div>
+					<BugTracker bugs={bugs} {...bugActions} />
+					<hr/>
+					<Counter {...counterActions} value={counter} />
+				</div>, 
+			document.getElementById('content'));
 		}
 		renderApp();
 	</script>

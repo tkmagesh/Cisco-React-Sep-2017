@@ -45,7 +45,7 @@
 	<script src="react.js"></script>
 	<script src="react-dom.js"></script>
 	<script src="babel.min.js"></script>
-	<script src="stateManager.js"></script>
+	<script src="redux.js"></script>
 	
 
 	<script type="text/babel">
@@ -130,36 +130,31 @@
 			return currentState;
 		}
 
-		
-		function newBugActionFactory(dispatch){
-			return function(newBugName){
+		var bugActionsCreators = {
+			addNew : function(newBugName){
 				let newBugAction = { type : bugActionNames.add_new, payload : newBugName};
-				dispatch(newBugAction);
-			}
-		}
+				return newBugAction;
+			},
 
-		function toggleBugActionFactory(dispatch){
-			return function(bugToToggle){
+			toggle : function(bugToToggle){
 				let toggleBugAction = { type : bugActionNames.toggle, payload : bugToToggle};
-				dispatch(toggleBugAction);
-			}
-		}
+				return toggleBugAction;
+			},
 
-		function removeClosedActionFactory(dispatch){
-			return function(){
+			removeClosed : function(){
 				let removeClosedAction = { type : bugActionNames.remove_closed};
-				dispatch(removeClosedAction);
+				return removeClosedAction;
 			}
 		}
+		
+		
 
 		
-		window.store = SM.createStore(bugsReducer);
+		window.store = Redux.createStore(bugsReducer);
 		store.subscribe(renderApp)
-		let bugActions = {
-			addNew : newBugActionFactory(store.dispatch),
-			toggle : toggleBugActionFactory(store.dispatch),
-			removeClosed : removeClosedActionFactory(store.dispatch)
-		}
+		
+		let bugActions = Redux.bindActionCreators(bugActionsCreators, store.dispatch);
+
 		function renderApp(){
 			ReactDOM.render(<BugTracker bugs={store.getState()} {...bugActions} />, document.getElementById('content'));
 		}
