@@ -59,13 +59,13 @@
 			onCreateNewClick(){
 				let newBugName = this.refs.txtBugName.value,
 					newBugAction = { type : bugActions.add_new, payload : newBugName};
-				this.props.store.dispatch(newBugAction);
+				this.props.dispatch(newBugAction);
 			}
 			
 			render(){
-				let bugs = this.props.store.getState(),
+				let { bugs, dispatch } = this.props,
 					bugItems = bugs.map((bug,index) => (
-						<BugItem store={this.props.store} bug={bug} key={index} />
+						<BugItem dispatch={dispatch} bug={bug} key={index} />
 					));
 				return(
 					<div>
@@ -104,7 +104,7 @@
 			bugNameClick(){
 				let bugToToggle = this.props.bug;
 				let toggleBugAction = { type : bugActions.toggle, payload : bugToToggle};
-				this.props.store.dispatch(toggleBugAction);
+				this.props.dispatch(toggleBugAction);
 			}
 			render(){
 				let bug = this.props.bug;
@@ -136,7 +136,7 @@
 		window.store = SM.createStore(bugsReducer);
 		store.subscribe(renderApp)
 		function renderApp(){
-			ReactDOM.render(<BugTracker store={store}/>, document.getElementById('content'));
+			ReactDOM.render(<BugTracker bugs={store.getState()} dispatch={store.dispatch}/>, document.getElementById('content'));
 		}
 		renderApp();
 	</script>

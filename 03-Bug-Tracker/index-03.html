@@ -49,23 +49,24 @@
 	
 
 	<script type="text/babel">
-		let bugActions = {
+		let bugActionNames = {
 			add_new : 'ADD_NEW',
 			toggle : 'TOGGLE',
 			remove_closed : 'REMOVE_CLOSED'
 		};
 
+		
 		class BugTracker extends React.Component{
 			onCreateNewClick(){
-				let newBugName = this.refs.txtBugName.value,
-					newBugAction = { type : bugActions.add_new, payload : newBugName};
-				this.props.store.dispatch(newBugAction);
+				let newBugName = this.refs.txtBugName.value;
+				this.props.addNew(newBugName);
 			}
 			
 			render(){
-				let bugs = this.props.store.getState(),
+
+				let { bugs, toggle } = this.props,
 					bugItems = bugs.map((bug,index) => (
-						<BugItem store={this.props.store} bug={bug} key={index} />
+						<BugItem toggle={toggle} bug={bug} key={index} />
 					));
 				return(
 					<div>
@@ -103,8 +104,7 @@
 		class BugItem extends React.Component{
 			bugNameClick(){
 				let bugToToggle = this.props.bug;
-				let toggleBugAction = { type : bugActions.toggle, payload : bugToToggle};
-				this.props.store.dispatch(toggleBugAction);
+				this.props.toggle(bugToToggle);
 			}
 			render(){
 				let bug = this.props.bug;
@@ -117,7 +117,7 @@
 		}
 		function bugsReducer(currentState = [], action){
 			
-			if(action.type === bugActions.add_new){
+			if(action.type === bugActionNames.add_new){
 				let bugName = action.payload,
 					newBug = {
 						name : bugName,
@@ -125,7 +125,7 @@
 					}
 				return [...currentState, newBug];
 			}
-			if (action.type === bugActions.toggle){
+			if (action.type === bugActionNames.toggle){
 				let bugToToggle = action.payload,
 					toggledBug = {...bugToToggle, isClosed : !bugToToggle.isClosed};
 				return currentState.map(bug => bug === bugToToggle ? toggledBug : bug);
@@ -133,10 +133,29 @@
 			return currentState;
 		}
 
+		function newBugActionFactory(dispatch){
+			return function(newBugName){
+				let newBugAction = { type : bugActionNames.add_new, payload : newBugName};
+				dispatch(newBugAction);
+			}
+		}
+
+		function toggleBugActionFactory(dispatch){
+			return function(bugToToggle){
+				let toggleBugAction = { type : bugActionNames.toggle, payload : bugToToggle};
+				dispatch(toggleBugAction);
+			}
+		}
+
+		
 		window.store = SM.createStore(bugsReducer);
 		store.subscribe(renderApp)
+		let bugActions = {
+			addNew : newBugActionFactory(store.dispatch),
+			toggle : toggleBugActionFactory(store.dispatch)
+		}
 		function renderApp(){
-			ReactDOM.render(<BugTracker store={store}/>, document.getElementById('content'));
+			ReactDOM.render(<BugTracker bugs={store.getState()} {...bugActions} />, document.getElementById('content'));
 		}
 		renderApp();
 	</script>
